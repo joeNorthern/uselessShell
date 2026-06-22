@@ -1,0 +1,6 @@
+// you really gonna read allat?
+
+So what I am planning to do is to make some sort of implementation of a basic shell that accepts ordinary bash commands
+like 'ls' 'ls -a' 'eco' and etc.
+
+What I wanna try to do right now is to try and use the combination of fork() and exec() functions.
