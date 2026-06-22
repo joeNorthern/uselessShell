@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+#include "shellio.h"
 
 #define MAXLINE 1024
 
@@ -20,20 +18,4 @@ int main(int argc, char **argv)
 		printf("%s\n", s);
 		printf("❯ ");
 	}
-}
-
-int getcomm(char *s, size_t maxlen)
-{
-	char c;
-	int n = 0;
-
-	while((c = getchar()) != EOF && n < maxlen-1 && c != '\n')
-	{
-		s[n++] = c;
-	}
-	if(c == '\n')
-	{
-		*(s+n) = '\0';
-	}
-	return n;
 }
