@@ -1,7 +1,6 @@
-total 36
-drwxrwxr-x 2 joealabama joealabama  4096 Jun 23 16:21 .
+total 32
+drwxrwxr-x 2 joealabama joealabama  4096 Jun 23 16:46 .
 drwxrwxr-x 8 joealabama joealabama  4096 Jun 20 20:40 ..
 -rw-rw-r-- 1 joealabama joealabama   142 Jun 22 17:18 Makefile
--rw-r--r-- 1 joealabama joealabama   370 Jun 23 16:20 new.txt
--rwxrwxr-x 1 joealabama joealabama 16736 Jun 23 16:21 shell
--rw-r--r-- 1 joealabama joealabama     0 Jun 23 16:22 text.txt
+-rwxrwxr-x 1 joealabama joealabama 16736 Jun 23 16:45 shell
+-rw-r--r-- 1 joealabama joealabama     0 Jun 23 16:46 text.txt

@@ -57,18 +57,14 @@ int handlcomm(char *src[])
 				_exit(127);
 			} else
 			{
-				if(*(*(src+i)) == '-')
-				{
-					prmtridx[p++] = i;
-				}
+				++i;
 			}
-			++i;
 		}
 		int a = 0;
-		prmtridx[p] = NULL;
-		while(prmtridx[a++] != NULL)
+		while(src[a] != NULL)
 		{
 			src2[index++] = src[a];
+			a++;
 		}
 		src2[a] = NULL;
 		execvp(src[0], src2);
