@@ -10,10 +10,6 @@ int getcomm(char *s, size_t maxlen)
     {
         s[n++] = c;
     }
-	if(c == '\n')
-	{
-		s[n++] = c;
-	}
     s[n] = '\0';
     return n;
 }

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "shellio.h"
+#include "shellhandle.h"
 
 #define MAXLINE 1024
 
@@ -19,12 +20,12 @@ int main(int argc, char **argv)
 		if(*s == '\n')
 		{
 			printf("❯ ");
-		} else if(isalnum(s[0]))
+		} else if(isascii(s[0]) && s[0] != '\0')
 		{
-			int n = prscomm(s, dst);
-			for(int i = 0; i < n; ++i)
+			prscomm(s, dst);
+			if(handlcomm(dst) == 0)
 			{
-				printf("%s\n", dst[i]);
+				printf("good shit\n");
 			}
 			printf("❯ ");
 		} else
