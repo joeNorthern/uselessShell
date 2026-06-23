@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <ctype.h>
 #include <sys/wait.h>
 #include <sys/types.h>
 
@@ -10,14 +11,19 @@
 
 int prscomm(char *src, char *dst[])
 {
-	char *piece = strtok(src, " ");
+	int i = 0;
+	while(src[i] != '\0' && isspace((int)src[i]))
+	{
+		++i;
+	}
+	char *piece = strtok(src+i, " \n\t");
 	int count = 0;
 	int num = 0;
 	
 	while(piece != NULL)
 	{
 		dst[count++] = piece;
-		piece = strtok(NULL, " ");
+		piece = strtok(NULL, " \n\t");
 		++num;
 	}
 	dst[count] = NULL;

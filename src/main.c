@@ -9,21 +9,24 @@
 
 int main(int argc, char **argv)
 {
-	char s[MAXLINE] = {0};
+	char src[MAXLINE] = {0};
 	char *dst[MAXLINE] = {0};
-	int i;
+	size_t i;
 	system("clear");
 	printf("❯ ");
 
-	while((i = getcomm(s, MAXLINE)) >= 0)
+	while((i = getcomm(src, MAXLINE)) >= 0)
 	{
-		if(*s == '\n')
+		if(src[0] == '\n')
 		{
 			printf("❯ ");
-		} else if(isascii(s[0]) && s[0] != '\0')
+		} else if(isascii(src[0]) && src[0] != '\0')
 		{
-			prscomm(s, dst);
-			if(handlcomm(dst) == 0)
+			int n = prscomm(src, dst);
+			if(n == 0)
+			{
+				printf("❯ ");
+			} else if(handlcomm(dst) == 0)
 			{
 				printf("❯ ");
 			} else
