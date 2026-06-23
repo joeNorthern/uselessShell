@@ -9,8 +9,8 @@
 
 int main(int argc, char **argv)
 {
-	char s[MAXLINE];
-	char *dst[MAXLINE];
+	char s[MAXLINE] = {0};
+	char *dst[MAXLINE] = {0};
 	int i;
 	system("clear");
 	printf("❯ ");

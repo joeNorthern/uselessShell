@@ -6,6 +6,7 @@
 #include <sys/types.h>
 
 #define MAXLINE 512
+#define MAXOP 512
 
 int prscomm(char *src, char *dst[])
 {
@@ -30,13 +31,16 @@ int handlcomm(char *src[])
 	if(pid == 0)
 	{
 		size_t i = 0;
+		size_t p = 0;
+		char prmtridx[MAXOP];
+		char *src2[MAXLINE];
+		size_t index = 0;
+
 		while(src[i] != NULL)
 		{
 			if(memcmp(src[i], ">", 1) == 0)
 			{	
-				char *src2[MAXLINE];
 				int n = i;
-				size_t index = 0;
 
 				do {
 					src2[index++] = src[n];
@@ -53,9 +57,22 @@ int handlcomm(char *src[])
 				_exit(127);
 			} else
 			{
-				++i;
+				if(*(*(src+i)) == '-')
+				{
+					prmtridx[p++] = i;
+				}
 			}
+			++i;
 		}
+		int a = 0;
+		prmtridx[p] = NULL;
+		while(prmtridx[a++] != NULL)
+		{
+			src2[index++] = src[a];
+		}
+		src2[a] = NULL;
+		execvp(src[0], src2);
+		perror("exec");
 		_exit(1);
 	} else if (pid > 0)
 	{
