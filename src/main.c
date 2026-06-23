@@ -25,9 +25,12 @@ int main(int argc, char **argv)
 			prscomm(s, dst);
 			if(handlcomm(dst) == 0)
 			{
-				printf("good shit\n");
+				printf("❯ ");
+			} else
+			{
+				printf("error: %s\n", strerror(127));
+				printf("❯ ");
 			}
-			printf("❯ ");
 		} else
 		{
 			printf("exit\n");

@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+
+#define MAXLINE 512
 
 int prscomm(char *src, char *dst[])
 {
@@ -30,12 +33,27 @@ int handlcomm(char *src[])
 		while(src[i] != NULL)
 		{
 			if(memcmp(src[i], ">", 1) == 0)
-			{
-				printf("it detected >\n");
-				_exit(0);
+			{	
+				char *src2[MAXLINE];
+				int n = i;
+				size_t index = 0;
+
+				do {
+					src2[index++] = src[n];
+				} while(n > 0 && --n);
+				src2[index] = NULL;
+
+				int filefd = open(src[i+1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
+				if(filefd < 0) { perror("open"); _exit(1); }
+				dup2(filefd, STDOUT_FILENO);
+				close(filefd);
+				
+				execvp(src[0], src2);
+				perror("execvp");
+				_exit(127);
 			} else
 			{
-				_exit(1);
+				++i;
 			}
 		}
 		_exit(1);
