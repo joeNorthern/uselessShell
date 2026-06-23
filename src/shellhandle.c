@@ -37,8 +37,6 @@ int handlcomm(char *src[])
 	if(pid == 0)
 	{
 		size_t i = 0;
-		size_t p = 0;
-		char prmtridx[MAXOP];
 		char *src2[MAXLINE];
 		size_t index = 0;
 
