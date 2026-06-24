@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 				printf("❯ ");
 			} else
 			{
-				printf("error: %s\n", strerror(127));
+				printf("error: %s\n", strerror(1));
 				printf("❯ ");
 			}
 		} else
