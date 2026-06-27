@@ -123,8 +123,7 @@ int handlcomm(char *src[])
 						int left, right;
 						left = right = denomc;
 
-						temphold = righttok(src, temp, left);
-						out2filestr(temphold, denomc);
+						out2filestr(righttok(src, temp, left), denomc);
 						lefttok(src, temp, left);
 						src2[1] = NULL;
 						execvp(temp, src2);
