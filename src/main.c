@@ -14,7 +14,7 @@ int main()
 {
 	char s[TOTAL_COMMAND_LENGHT] = {0};
 	char *dst[256] = {0};
-	size_t len = 0;
+	ssize_t len = 0;
     printf("\033[2J\033[1;1H");
 	printf("$ ");
 	
@@ -28,12 +28,11 @@ int main()
 		memset(s, 0, sizeof(s));
 		printf("$ ");
 	}
-	if(len == NEWLINE_REPL)
+	if(len == 0)
 	{
+		printf("$ ");
 		goto recursion;
-	} else if(len == EXIT_SHELL)
-	{
-		printf("exit\n");
-		return 0;
 	}
+	if(len == -1)
+		exit(0);
 }

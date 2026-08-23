@@ -6,8 +6,14 @@
 
 #define SH_BLANKS " \t"
 #define SH_OPS "><&|"
+#define SH_COND_SEQUENCE "&&"
+#define SH_COMPLETE 1
+#define SH_FAIL -1
 
 static char *const sh_ops[] = {"&&", "|", ">", "<", NULL};
+static char *sh_substr[256] = {NULL};
+static char sh_cpsr = 0;
+
 static char* op_match(const char *src);
 
 size_t sh_tokenize_input(char *src, char **dst)
@@ -30,9 +36,8 @@ size_t sh_tokenize_input(char *src, char **dst)
 		dst[count++] = src; /* point to a new relevant start of input */
 		src += strcspn(src, SH_BLANKS SH_OPS); /* loop and return amount of bytes passed till SH_BLANKS/OPS found */
 		if(*src != '\0' && strchr(SH_BLANKS, *src) != NULL) /* check wether it's the end OR a newline. Helps line 19  */
-             *src++ = '\0'                               	/* exclude trailing newlines. If so, set it as null-term  */
+             *src++ = '\0';                               	/* exclude trailing newlines. If so, set it as null-term  */
 	}                                                       /* and increment the pointer to the next character.       */
-	dst[count++] = NULL;
 	dst[count] = NULL;
 	return count-1;
 }
@@ -48,12 +53,49 @@ static char* op_match(const char *src)
 	return NULL;
 }
 
-void change_stream(char **src)
+void change_stdout(char *src)
 {
 	;
 }
 
-void sh_handle(char **src)
-{
 
+
+void sh_determine(const char **src)
+{
+	const char **word_p = src;
+	size_t i = 0;
+	while(*word_p != NULL && strcmp(*word_p, SH_COND_SEQUENCE) != 0)
+	{
+		sh_substr[i++] = *word_p;
+		word_p++;
+	} 
+	sh_substr[i] = NULL;
+
+	if(*word_p == NULL)
+	{
+		; /* total control transfer to exevp goes here */
+	} else
+	{
+		/*
+		a function that will parse the current relevant command goes here
+		it should return SH_COMPLETE, and then we will increment
+		word_p again. Recursed
+
+		*/
+		word_p++; /* saving frame for post condition sequence commands */
+		printf("--------------------\n");
+		sh_determine(word_p);
+	}
+}
+
+void sh_debug_input(const char **src)
+{
+	char const **p = src;
+	while(*p != NULL)
+		printf("%s\n", *p++);
+}
+
+void sh_handle(const char **src)
+{
+	sh_determine(src);
 }
