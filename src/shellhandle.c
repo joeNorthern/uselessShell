@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 
 #define SH_BLANKS " \t"
 #define SH_OPS "><&|"
 #define SH_COND_SEQUENCE "&&"
+#define SH_INPUT_REDIR ">"
 #define SH_COMPLETE 1
 #define SH_FAIL -1
 
@@ -15,6 +17,7 @@ static char *sh_substr[256] = {NULL};
 static char sh_cpsr = 0;
 
 static char* op_match(const char *src);
+void sh_debug_input(const char **src);
 
 size_t sh_tokenize_input(char *src, char **dst)
 {
@@ -53,37 +56,65 @@ static char* op_match(const char *src)
 	return NULL;
 }
 
-void change_stdout(char *src)
+void sh_fd_redirect(char **substr, size_t idx, int oldfd)
 {
-	;
+	int fd = open(*(substr + idx), O_WRONLY | O_CREAT | O_TRUNC, 0666); 
+	if(fd < 0) { perror(substr[idx]); _exit(1); }
+	if(dup2(fd, STDOUT_FILENO) < 0) { perror("dup2"); _exit(1); }
+	close(fd);
 }
 
-
-
-void sh_determine(const char **src)
+void sh_ctrlop_lookup(char **substr)
 {
-	const char **word_p = src;
+	int i = 0;
+	int fstatus;
+	while(substr[i] != NULL &&(fstatus = strcmp(substr[i], SH_INPUT_REDIR)) != 0)
+		++i;
+
+	if(!fstatus)
+	{
+	// printf("output transferred to %s\n", substr[i+1]);
+		substr[i] = NULL;
+		sh_fd_redirect(substr, i+1, STDOUT_FILENO);
+	}
+}
+
+void sh_attempt_fork(char **src)
+{
+	pid_t pid = fork();
+	if(pid < 0) { perror("fork"); return; }
+	if(pid == 0)
+	{
+	// 	printf("I ran\n");
+		sh_ctrlop_lookup(src);
+		int sh_cpsr = execvp(src[0], src);
+		if(sh_cpsr < 0) { printf("Error: execv didn't replace the needed process\n"); return; }
+		_exit(0);
+	}
+	int status;
+	if(waitpid(pid, &status, 0) < 0) { perror("waitpid"); return; }
+	// printf("PID %d exited with status %d\n", pid, status);
+}
+
+void sh_determine(char **src)
+{
+	char **word_p = src;
 	size_t i = 0;
-	while(*word_p != NULL && strcmp(*word_p, SH_COND_SEQUENCE) != 0)
+	while(*word_p != NULL && strcmp(*word_p, SH_COND_SEQUENCE))
 	{
 		sh_substr[i++] = *word_p;
 		word_p++;
-	} 
+	}
 	sh_substr[i] = NULL;
 
 	if(*word_p == NULL)
 	{
-		; /* total control transfer to exevp goes here */
-	} else
+		sh_attempt_fork(sh_substr);
+	}
+	else
 	{
-		/*
-		a function that will parse the current relevant command goes here
-		it should return SH_COMPLETE, and then we will increment
-		word_p again. Recursed
-
-		*/
-		word_p++; /* saving frame for post condition sequence commands */
-		printf("--------------------\n");
+		sh_attempt_fork(sh_substr);
+		word_p++;
 		sh_determine(word_p);
 	}
 }
@@ -95,7 +126,7 @@ void sh_debug_input(const char **src)
 		printf("%s\n", *p++);
 }
 
-void sh_handle(const char **src)
+void sh_handle(char **src)
 {
 	sh_determine(src);
 }
