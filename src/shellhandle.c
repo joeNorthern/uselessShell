@@ -14,7 +14,7 @@
 
 static char *const sh_ops[] = {"&&", "|", ">", "<", NULL};
 static char *sh_substr[256] = {NULL};
-static char sh_cpsr = 0;
+static char sh_cpsr = SH_COMPLETE;
 
 static char* op_match(const char *src);
 void sh_debug_input(const char **src);
@@ -88,12 +88,18 @@ void sh_attempt_fork(char **src)
 	// 	printf("I ran\n");
 		sh_ctrlop_lookup(src);
 		int sh_cpsr = execvp(src[0], src);
-		if(sh_cpsr < 0) { printf("Error: execv didn't replace the needed process\n"); return; }
+		if(sh_cpsr < 0) { printf("Error: execv didn't replace the needed process\n"); _exit(1); }
 		_exit(0);
 	}
 	int status;
-	if(waitpid(pid, &status, 0) < 0) { perror("waitpid"); return; }
+	if(waitpid(pid, &status, 0) < 0)
+	{
+		sh_cpsr = SH_FAIL;
+		perror("waitpid");
+		return;
+	}
 	// printf("PID %d exited with status %d\n", pid, status);
+	sh_cpsr = SH_COMPLETE;
 }
 
 void sh_determine(char **src)
@@ -107,16 +113,15 @@ void sh_determine(char **src)
 	}
 	sh_substr[i] = NULL;
 
-	if(*word_p == NULL)
+	if(sh_substr[0] == NULL)
 	{
-		sh_attempt_fork(sh_substr);
+		printf("Critical error: faulty command\n");
+		return;
 	}
-	else
-	{
-		sh_attempt_fork(sh_substr);
-		word_p++;
-		sh_determine(word_p);
-	}
+	sh_attempt_fork(sh_substr);
+
+	if(*word_p != NULL && sh_cpsr == SH_COMPLETE)
+		sh_determine(word_p + 1);
 }
 
 void sh_debug_input(const char **src)
