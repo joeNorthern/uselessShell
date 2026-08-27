@@ -9,30 +9,33 @@
 #define TOTAL_COMMAND_LENGHT 1024
 
 int shell_getinput(char *s, size_t maxlen);
+void reset_arrays(char *arrayA, size_t lenA, char **arrayB, size_t countB);
 
 int main()
 {
 	char s[TOTAL_COMMAND_LENGHT] = {0};
 	char *dst[256] = {0};
 	ssize_t len = 0;
+
     printf("\033[2J\033[1;1H");
 	printf("$ ");
-	
-	recursion:
-	while((len = shell_getinput(s, TOTAL_COMMAND_LENGHT)) > 0)
-	{
-		sh_tokenize_input(s, dst);
-		sh_handle(dst);
 
-		memset(dst, 0, sizeof(dst));
-		memset(s, 0, sizeof(s));
-		printf("$ ");
-	}
-	if(len == 0)
+	while(1)
 	{
-		printf("$ ");
-		goto recursion;
+		if((len = shell_getinput(s, TOTAL_COMMAND_LENGHT)) > 0)
+		{
+			sh_tokenize_input(s, dst);
+			sh_handle(dst);
+			reset_arrays(s, sizeof(s), dst, sizeof(dst) / sizeof(dst[0]));
+			printf("$ ");
+		}
+		if(len == 0) printf("$ ");
+		if(len == -1) exit(0);
 	}
-	if(len == -1)
-		exit(0);
+}
+
+void reset_arrays(char *arrayA, size_t lenA, char **arrayB, size_t countB)
+{
+    memset(arrayA, 0, lenA);
+    memset(arrayB, 0, countB * sizeof(*arrayB));
 }
